@@ -1,0 +1,11 @@
+/eos/user/f/fcetorel/HtoZg/ele/ntuple_presel/ZGTo2LG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/HtoZg_ntuples_v2/190617_134738/0000/ntuple_1.root
+/eos/user/f/fcetorel/HtoZg/ele/ntuple_presel/ZGTo2LG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/HtoZg_ntuples_v2/190617_134738/0000/ntuple_10.root
+/eos/user/f/fcetorel/HtoZg/ele/ntuple_presel/ZGTo2LG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/HtoZg_ntuples_v2/190617_134738/0000/ntuple_11.root
+/eos/user/f/fcetorel/HtoZg/ele/ntuple_presel/ZGTo2LG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/HtoZg_ntuples_v2/190617_134738/0000/ntuple_2.root
+/eos/user/f/fcetorel/HtoZg/ele/ntuple_presel/ZGTo2LG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/HtoZg_ntuples_v2/190617_134738/0000/ntuple_3.root
+/eos/user/f/fcetorel/HtoZg/ele/ntuple_presel/ZGTo2LG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/HtoZg_ntuples_v2/190617_134738/0000/ntuple_4.root
+/eos/user/f/fcetorel/HtoZg/ele/ntuple_presel/ZGTo2LG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/HtoZg_ntuples_v2/190617_134738/0000/ntuple_5.root
+/eos/user/f/fcetorel/HtoZg/ele/ntuple_presel/ZGTo2LG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/HtoZg_ntuples_v2/190617_134738/0000/ntuple_6.root
+/eos/user/f/fcetorel/HtoZg/ele/ntuple_presel/ZGTo2LG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/HtoZg_ntuples_v2/190617_134738/0000/ntuple_7.root
+/eos/user/f/fcetorel/HtoZg/ele/ntuple_presel/ZGTo2LG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/HtoZg_ntuples_v2/190617_134738/0000/ntuple_8.root
+/eos/user/f/fcetorel/HtoZg/ele/ntuple_presel/ZGTo2LG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/HtoZg_ntuples_v2/190617_134738/0000/ntuple_9.root

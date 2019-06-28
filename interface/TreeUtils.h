@@ -66,6 +66,22 @@ struct TreeVars
   std::vector<float>* muons_pfIsoPhoton;
   std::vector<float>* muons_pfIsoPU;
   std::vector<int>* muons_trackerLayersWithMeasurement;
+
+  std::vector<float>* electrons_pt;
+  std::vector<float>* electrons_eta;
+  std::vector<float>* electrons_phi;
+  std::vector<float>* electrons_EnergyPostCorr;
+  std::vector<int>* electrons_charge;
+
+  std::vector<float>* electrons_MVAID;
+
+  std::vector<float>* photons_pt;
+  std::vector<float>* photons_eta;
+  std::vector<float>* photons_phi;
+  std::vector<float>* photons_EnergyPostCorr;
+
+
+  std::vector<float>* photons_MVAID;
   
   std::vector<float>* jets_pt;
   std::vector<float>* jets_eta;

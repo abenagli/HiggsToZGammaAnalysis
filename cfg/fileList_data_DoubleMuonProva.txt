@@ -1,0 +1,2 @@
+/eos/user/f/fcetorel/HtoZg/muon/ntuple_presel/DoubleMuon/HtoZg_ntuples_v1/190617_130306/0000/ntuple_1.root
+/eos/user/f/fcetorel/HtoZg/muon/ntuple_presel/DoubleMuon/HtoZg_ntuples_v1/190617_130306/0000/ntuple_10.root

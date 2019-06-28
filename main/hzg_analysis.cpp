@@ -45,6 +45,7 @@ int main(int argc, char** argv)
   CfgManager opts;
   opts.ParseConfigFile(argv[1]);
 
+
   int debugMode = 0;
   if( argc > 2 ) debugMode = atoi(argv[2]);
   
@@ -69,7 +70,8 @@ int main(int argc, char** argv)
     chain_reco -> Add(fileName.c_str());
     if( !isData ) chain_gen -> Add(fileName.c_str());
   }
-  
+
+
   TreeVars treeVars;
   InitTreeVars(chain_reco,chain_gen,treeVars);
   
@@ -84,21 +86,41 @@ int main(int argc, char** argv)
   int printRecoGenMatchEvent = opts.GetOpt<int>("Input.printRecoGenMatchEvent");
   int printRecoEvent = opts.GetOpt<int>("Input.printRecoGenMatchEvent");
   
-  float gen_mu_ptMin = opts.GetOpt<float>("Cuts.gen_mu_ptMin");
-  float gen_mu_etaMax = opts.GetOpt<float>("Cuts.gen_mu_etaMax");
-  int genCut = opts.GetOpt<int>("Cuts.genCut");
+  // float gen_mu_ptMin = opts.GetOpt<float>("Cuts.gen_mu_ptMin");
+  // float gen_mu_etaMax = opts.GetOpt<float>("Cuts.gen_mu_etaMax");
+  // int genCut = opts.GetOpt<int>("Cuts.genCut");
   
-  int genMatch = opts.GetOpt<int>("Cuts.genMatch");  
-  int genMatchCut = opts.GetOpt<int>("Cuts.genMatchCut");
+  // int genMatch = opts.GetOpt<int>("Cuts.genMatch");  
+  // int genMatchCut = opts.GetOpt<int>("Cuts.genMatchCut");
   
   int reco_HLTCut = opts.GetOpt<int>("Cuts.reco_HLTCut");
   std::vector<std::string> reco_HLT_paths = opts.GetOpt<std::vector<std::string> >("Cuts.reco_HLT_paths");
   int reco_HLT_OR = opts.GetOpt<int>("Cuts.reco_HLT_OR");
   
+  int doMuon = opts.GetOpt<int>("Cuts.doMuon");
+  int doEle = opts.GetOpt<int>("Cuts.doEle");
+
   float reco_ptMin1_mu = opts.GetOpt<float>("Cuts.reco_ptMin1_mu");
   float reco_ptMin2_mu = opts.GetOpt<float>("Cuts.reco_ptMin2_mu");
+  float reco_eta_mu = opts.GetOpt<float>("Cuts.reco_eta_mu");
+
+  float reco_ptMin1_ele = opts.GetOpt<float>("Cuts.reco_ptMin1_ele");
+  float reco_ptMin2_ele = opts.GetOpt<float>("Cuts.reco_ptMin2_ele");
+  float reco_eta_ele = opts.GetOpt<float>("Cuts.reco_eta_ele");
+  float reco_ID_ele = opts.GetOpt<float>("Cuts.reco_ID_ele");
+
+  float reco_ptMin_gamma = opts.GetOpt<float>("Cuts.reco_ptMin_gamma");
+  float reco_ID_gamma = opts.GetOpt<float>("Cuts.reco_ID_gamma");
+  float reco_eta_gamma = opts.GetOpt<float>("Cuts.reco_eta_gamma");
+  float reco_eta1_gamma = opts.GetOpt<float>("Cuts.reco_eta1_gamma");
+  float reco_eta2_gamma = opts.GetOpt<float>("Cuts.reco_eta2_gamma");
+  float reco_pToM_gamma = opts.GetOpt<float>("Cuts.reco_pToM_gamma");
+
+  float reco_DR_lep = opts.GetOpt<float>("Cuts.reco_DR_lep");
+  float reco_sumM = opts.GetOpt<float>("Cuts.reco_sumM");
   
-  
+  if (doMuon) std::cout << "Muon tag " << std::endl;
+  if (doEle)  {std::cout << "Electron tag " << std::endl;}
   /*
   //--- get scale factors files
   std::vector<std::string> SFparams_HLT = opts.GetOpt<std::vector<std::string> >("ScaleFactors.HLT");
@@ -240,7 +262,7 @@ int main(int argc, char** argv)
   
   //------------------------------
   //--- muon Rochester corrections
-  RoccoR rc("data/rcdata.2016.v3");
+  // RoccoR rc("data/rcdata.2016.v3");
   
   
   
@@ -252,8 +274,8 @@ int main(int argc, char** argv)
   int nEvents_selected = 0;
   int nEvents_selected_recoGenMatch = 0;
   
-  // for(int entry = 0; entry < 1000; ++entry)
-  for(int entry = 0; entry < chain_reco->GetEntries(); ++entry)
+  //for(int entry = 0; entry < 1000; ++entry)
+   for(int entry = 0; entry < chain_reco->GetEntries(); ++entry)
   {
     if( !debugMode && entry%100 == 0 ) std::cout << ">>> loop 1/1: reading entry " << entry << " / " << nEntries_recoTree << "\r" << std::flush;
     if(  debugMode && entry%1 == 0 ) std::cout << ">>> loop 1/1: reading entry " << entry << " / " << nEntries_recoTree << std::endl;
@@ -292,6 +314,9 @@ int main(int argc, char** argv)
     std::vector<particle> recoGenMatch_mu;
     
     particle reco_H;
+    particle reco_Z;
+    std::vector<particle> reco_gamma;
+    std::vector<particle> reco_ele;
     std::vector<particle> reco_mu;
     
     
@@ -301,15 +326,28 @@ int main(int argc, char** argv)
     std::vector<particle> temp_mu;
     std::vector<particle> temp_ele;
     std::vector<particle> temp_gamma;
+    
+    for(unsigned int ii = 0; ii < treeVars.photons_pt->size(); ++ii)
+    {
+      particle temp;
+           
+      temp.v.SetPtEtaPhiE(treeVars.photons_pt->at(ii),treeVars.photons_eta->at(ii),treeVars.photons_phi->at(ii),treeVars.photons_EnergyPostCorr->at(ii));
+      temp.it = ii;
+      temp_gamma.push_back(temp);
+     }
+     if( debugMode ) std::cout << ">>>>>> end filling photon vectors" << std::endl;
+
+   
+   
     for(unsigned int ii = 0; ii < treeVars.muons_pt->size(); ++ii)
     {
       particle temp;
       
       double SF = 1.;
-      if( isData )
-        SF = rc.kScaleDT(treeVars.muons_charge->at(ii),treeVars.muons_pt->at(ii),treeVars.muons_eta->at(ii),treeVars.muons_phi->at(ii));
-      if( !isData && treeVars.muons_trackerLayersWithMeasurement->at(ii) >  0 )
-        SF = rc.kScaleAndSmearMC(treeVars.muons_charge->at(ii),treeVars.muons_pt->at(ii),treeVars.muons_eta->at(ii),treeVars.muons_phi->at(ii),treeVars.muons_trackerLayersWithMeasurement->at(ii),gRandom->Rndm(),gRandom->Rndm());
+        // if( isData )
+        //   SF = rc.kScaleDT(treeVars.muons_charge->at(ii),treeVars.muons_pt->at(ii),treeVars.muons_eta->at(ii),treeVars.muons_phi->at(ii));
+        // if( !isData && treeVars.muons_trackerLayersWithMeasurement->at(ii) >  0 )
+        //   SF = rc.kScaleAndSmearMC(treeVars.muons_charge->at(ii),treeVars.muons_pt->at(ii),treeVars.muons_eta->at(ii),treeVars.muons_phi->at(ii),treeVars.muons_trackerLayersWithMeasurement->at(ii),gRandom->Rndm(),gRandom->Rndm());
       
       temp.v.SetPtEtaPhiE(SF*treeVars.muons_pt->at(ii),treeVars.muons_eta->at(ii),treeVars.muons_phi->at(ii),SF*treeVars.muons_energy->at(ii));
       temp.charge = treeVars.muons_charge->at(ii);
@@ -318,9 +356,25 @@ int main(int argc, char** argv)
       temp_mu.push_back(temp);
     }
     std::sort(temp_mu.begin(),temp_mu.end(),PtSort());
-    if( debugMode ) std::cout << ">>>>>> end filling particle vectors" << std::endl;
+    if( debugMode ) std::cout << ">>>>>> end filling muon vectors" << std::endl;
+
+
+
+    for(unsigned int ii = 0; ii < treeVars.electrons_pt->size(); ++ii)
+    {
+      particle temp;
+           
+      temp.v.SetPtEtaPhiE(treeVars.electrons_pt->at(ii),treeVars.electrons_eta->at(ii),treeVars.electrons_phi->at(ii),treeVars.electrons_EnergyPostCorr->at(ii));
+      temp.charge = treeVars.electrons_charge->at(ii);
+      temp.pdgId = -13 * temp.charge;
+      temp.it = ii;
+      temp_ele.push_back(temp);
+    }
+
+    if( debugMode ) std::cout << ">>>>>> end filling electron vectors" << std::endl;
     
     
+     if( debugMode ) std::cout << ">>>>>> end filling particle vectors" << std::endl;
     /*
     //---------------------
     //--- retrieve gen info
@@ -484,13 +538,13 @@ int main(int argc, char** argv)
     bool trgPassOne = false;
     for(unsigned int ii = 0; ii < treeVars.trgs_name->size(); ++ii)
     {
-      // std::cout << "HLT name: " << treeVars.trgs_name->at(ii) << "   pass: " << treeVars.trgs_pass->at(ii) << "    prescale: " << treeVars.trgs_prescale->at(ii) << std::endl;
+       //std::cout << "HLT name: " << treeVars.trgs_name->at(ii) << "   pass: " << treeVars.trgs_pass->at(ii) << "    prescale: " << treeVars.trgs_prescale->at(ii) << std::endl;
       for(unsigned int jj = 0; jj < reco_HLT_paths.size(); ++jj)
       {
         std::size_t found = treeVars.trgs_name->at(ii).find( reco_HLT_paths.at(jj) );
         if (found != std::string::npos )
         {
-          // std::cout << "HLT name: " << treeVars.trgs_name->at(ii) << "   pass: " << treeVars.trgs_pass->at(ii) << "    prescale: " << treeVars.trgs_prescale->at(ii) << std::endl;
+         // std::cout << "HLT name: " << treeVars.trgs_name->at(ii) << "   pass: " << treeVars.trgs_pass->at(ii) << "    prescale: " << treeVars.trgs_prescale->at(ii) << std::endl;
           if( treeVars.trgs_pass->at(ii) == 1 )
           {
             trgPassOne = true;
@@ -514,50 +568,82 @@ int main(int argc, char** argv)
     
     //---------------------
     //--- select reco muons
-    if( debugMode ) std::cout << ">>>>>> start reco mu selection" << std::endl;
-    
-    if( temp_mu.size() < 2 ) continue;
-    
-    float mu1_iso;
-    for(unsigned int ii = 0; ii < temp_mu.size(); ++ii)
+    if (doMuon)
     {
-      if( temp_mu.at(ii).v.Pt() < reco_ptMin1_mu ) continue;
-      if( treeVars.muons_isLoose->at(temp_mu.at(ii).it) != 1 ) continue;
-      if( fabs(treeVars.muons_dxy->at(temp_mu.at(ii).it)) > 0.05 ) continue;
-      if( fabs(treeVars.muons_dz->at(temp_mu.at(ii).it))  > 0.10 ) continue;
-      
-      mu1_iso = treeVars.muons_pfIsoChargedHadron->at(temp_mu.at(ii).it) +
-      std::max(0.,treeVars.muons_pfIsoNeutralHadron->at(temp_mu.at(ii).it)+treeVars.muons_pfIsoPhoton->at(temp_mu.at(ii).it)-0.5*treeVars.muons_pfIsoPU->at(temp_mu.at(ii).it));
-      if( mu1_iso/temp_mu.at(ii).v.Pt() > 0.25 ) continue;
-      
-      reco_mu.push_back( temp_mu.at(ii) );
-      break;
-    }
-    if( reco_mu.size() < 1 ) continue;
+      if( debugMode ) std::cout << ">>>>>> start reco mu selection" << std::endl;
     
-    float mu2_iso;
-    for(unsigned int ii = 0; ii < temp_mu.size(); ++ii)
-    {
-      if( reco_mu.at(0).charge*temp_mu.at(ii).charge == 1 ) continue;
-      if( temp_mu.at(ii).v.Pt() < reco_ptMin2_mu ) continue;
-      if( treeVars.muons_isLoose->at(temp_mu.at(ii).it) != 1 ) continue;
-      if( fabs(treeVars.muons_dxy->at(temp_mu.at(ii).it)) > 0.05 ) continue;
-      if( fabs(treeVars.muons_dz->at(temp_mu.at(ii).it))  > 0.10 ) continue;
+      if( temp_gamma.size() < 1 ) continue;
+      if( temp_mu.size() < 2 ) continue;
+    
+      for(unsigned int ii = 0; ii < temp_gamma.size(); ++ii)
+      {
+        if( temp_gamma.at(ii).v.Pt() < reco_ptMin_gamma ) continue;
+        if( fabs(temp_gamma.at(ii).v.Eta()) > reco_eta_gamma ) continue;
+        if( fabs(temp_gamma.at(ii).v.Eta()) > reco_eta1_gamma && fabs(temp_gamma.at(ii).v.Eta()) < reco_eta2_gamma) continue;
+	if (treeVars.photons_MVAID->at(temp_gamma.at(ii).it) < reco_ID_gamma) continue;
       
-      mu2_iso = treeVars.muons_pfIsoChargedHadron->at(temp_mu.at(ii).it) +
+        reco_gamma.push_back( temp_gamma.at(ii) );
+        break;
+      }
+
+      if( reco_gamma.size() < 1 ) continue;
+      float mu1_DR;
+      float mu1_iso;
+      for(unsigned int ii = 0; ii < temp_mu.size(); ++ii)
+      {
+        if( temp_mu.at(ii).v.Pt() < reco_ptMin1_mu ) continue;
+        if( treeVars.muons_isLoose->at(temp_mu.at(ii).it) != 1 ) continue;
+        if( fabs(temp_mu.at(ii).v.Eta()) > reco_eta_mu ) continue;
+        if( fabs(treeVars.muons_dxy->at(temp_mu.at(ii).it)) > 0.05 ) continue;
+        if( fabs(treeVars.muons_dz->at(temp_mu.at(ii).it))  > 0.10 ) continue;
+      
+        mu1_iso = treeVars.muons_pfIsoChargedHadron->at(temp_mu.at(ii).it) +
         std::max(0.,treeVars.muons_pfIsoNeutralHadron->at(temp_mu.at(ii).it)+treeVars.muons_pfIsoPhoton->at(temp_mu.at(ii).it)-0.5*treeVars.muons_pfIsoPU->at(temp_mu.at(ii).it));
-      if( mu2_iso/temp_mu.at(ii).v.Pt() > 0.25 ) continue;
+        
+        if( mu1_iso/temp_mu.at(ii).v.Pt() > 0.25 ) continue;
+        
+        mu1_DR = DeltaR(reco_gamma.at(0).v.Eta(),reco_gamma.at(0).v.Phi(),temp_mu.at(ii).v.Eta(),temp_mu.at(ii).v.Phi());
+        if (mu1_DR < reco_DR_lep) continue;
+        reco_mu.push_back( temp_mu.at(ii) );
+        break;
+      }
+      if( reco_mu.size() < 1 ) continue;
+    
+      float mu2_DR;
+      float mu2_iso;
+      for(unsigned int ii = 0; ii < temp_mu.size(); ++ii)
+      {
+        if( reco_mu.at(0).charge*temp_mu.at(ii).charge == 1 ) continue;
+        if( temp_mu.at(ii).v.Pt() < reco_ptMin2_mu ) continue;
+        if( fabs(temp_mu.at(ii).v.Eta()) > reco_eta_mu ) continue;
+        if( treeVars.muons_isLoose->at(temp_mu.at(ii).it) != 1 ) continue;
+        if( fabs(treeVars.muons_dxy->at(temp_mu.at(ii).it)) > 0.05 ) continue;
+        if( fabs(treeVars.muons_dz->at(temp_mu.at(ii).it))  > 0.10 ) continue;
       
-      reco_mu.push_back( temp_mu.at(ii) );
-      break;
-    }
-    if( reco_mu.size() < 2 ) continue;
-    
-    reco_H.v = reco_mu.at(0).v + reco_mu.at(1).v;
-    reco_H.charge = reco_mu.at(0).charge + reco_mu.at(1).charge; 
-    reco_H.pdgId = 25;
-    if( debugMode ) std::cout << ">>>>>> end reco mu selection" << std::endl;
-    
+        mu2_iso = treeVars.muons_pfIsoChargedHadron->at(temp_mu.at(ii).it) +
+        std::max(0.,treeVars.muons_pfIsoNeutralHadron->at(temp_mu.at(ii).it)+treeVars.muons_pfIsoPhoton->at(temp_mu.at(ii).it)-0.5*treeVars.muons_pfIsoPU->at(temp_mu.at(ii).it));
+        if( mu2_iso/temp_mu.at(ii).v.Pt() > 0.25 ) continue;
+        mu2_DR = DeltaR(reco_gamma.at(0).v.Eta(),reco_gamma.at(0).v.Phi(),temp_mu.at(ii).v.Eta(),temp_mu.at(ii).v.Phi());
+        if (mu2_DR < reco_DR_lep) continue;
+	
+
+        reco_mu.push_back( temp_mu.at(ii) );
+        break;
+      }
+      if( reco_mu.size() < 2 ) continue;
+      
+      reco_Z.v = reco_mu.at(0).v + reco_mu.at(1).v;
+      reco_Z.charge = reco_mu.at(0).charge + reco_mu.at(1).charge; 
+      if ( reco_Z.v.M() < 50 ) continue;
+
+      reco_H.v = reco_mu.at(0).v + reco_mu.at(1).v + reco_gamma.at(0).v;
+      reco_H.charge = reco_mu.at(0).charge + reco_mu.at(1).charge; 
+      reco_H.pdgId = 25;
+      if ( ((reco_gamma.at(0).v.Pt()) /(reco_H.v.M())) < reco_pToM_gamma ) continue;
+      if ((reco_H.v + reco_Z.v).M() < reco_sumM ) continue;
+
+      if( debugMode ) std::cout << ">>>>>> end reco mu selection" << std::endl;
+    		
     
     
     /*
@@ -726,56 +812,87 @@ int main(int argc, char** argv)
     
     
     
-    //---------------------------
-    //--- fill out tree variables
-    if( debugMode ) std::cout << ">>>>>> start filling out tree" << std::endl;
-    outTree.vtxs_n = treeVars.vtxs_n;
-    outTree.rho_all = treeVars.rho_all;
+      //---------------------------
+      //--- fill out tree variables
+  
+      if( debugMode ) std::cout << ">>>>>> start filling out tree" << std::endl;
+      outTree.vtxs_n = treeVars.vtxs_n;
+      outTree.rho_all = treeVars.rho_all;
+
+      outTree.gamma_pt = reco_gamma.at(0).v.Pt();
+      outTree.gamma_eta = reco_gamma.at(0).v.Eta();
+      outTree.gamma_phi = reco_gamma.at(0).v.Phi();    
+      outTree.gamma_DR1 = DeltaR(reco_gamma.at(0).v.Eta(),reco_gamma.at(0).v.Phi(),reco_mu.at(0).v.Eta(),reco_mu.at(0).v.Phi());
+      outTree.gamma_DR2 = DeltaR(reco_gamma.at(0).v.Eta(),reco_gamma.at(0).v.Phi(),reco_mu.at(1).v.Eta(),reco_mu.at(1).v.Phi());
+      outTree.gamma_IDMVA = treeVars.photons_MVAID->at(reco_gamma.at(0).it);
     
-    outTree.mu1_pt = reco_mu.at(0).v.Pt();
-    outTree.mu2_pt = reco_mu.at(1).v.Pt();
-    outTree.mu1_eta = reco_mu.at(0).v.Eta();
-    outTree.mu2_eta = reco_mu.at(1).v.Eta();
-    outTree.mu1_phi = reco_mu.at(0).v.Phi();
-    outTree.mu2_phi = reco_mu.at(1).v.Phi();
-    outTree.mu1_dxy = treeVars.muons_dxy->at(reco_mu.at(0).it);
-    outTree.mu2_dxy = treeVars.muons_dxy->at(reco_mu.at(1).it);
-    outTree.mu1_dxyPull = fabs(treeVars.muons_dxy->at(reco_mu.at(0).it))/treeVars.muons_dxyErr->at(reco_mu.at(0).it);
-    outTree.mu2_dxyPull = fabs(treeVars.muons_dxy->at(reco_mu.at(1).it))/treeVars.muons_dxyErr->at(reco_mu.at(1).it);
-    outTree.mu1_dz = treeVars.muons_dz->at(reco_mu.at(0).it);
-    outTree.mu2_dz = treeVars.muons_dz->at(reco_mu.at(1).it);
-    outTree.mu1_dzPull = fabs(treeVars.muons_dz->at(reco_mu.at(0).it))/treeVars.muons_dzErr->at(reco_mu.at(0).it);
-    outTree.mu2_dzPull = fabs(treeVars.muons_dz->at(reco_mu.at(1).it))/treeVars.muons_dzErr->at(reco_mu.at(1).it);
-    outTree.mu1_relIso = mu1_iso/reco_mu.at(0).v.Pt();
-    outTree.mu2_relIso = mu2_iso/reco_mu.at(1).v.Pt();
-    outTree.mu1_isL = treeVars.muons_isLoose->at(reco_mu.at(0).it);
-    outTree.mu2_isL = treeVars.muons_isLoose->at(reco_mu.at(1).it);
-    outTree.mu1_isM = treeVars.muons_isMedium->at(reco_mu.at(0).it);
-    outTree.mu2_isM = treeVars.muons_isMedium->at(reco_mu.at(1).it);
-    outTree.mu1_isT = treeVars.muons_isTight->at(reco_mu.at(0).it);
-    outTree.mu2_isT = treeVars.muons_isTight->at(reco_mu.at(1).it);
-    outTree.mu_Deta = DeltaEta(reco_mu.at(0).v.Eta(),reco_mu.at(1).v.Eta());
-    outTree.mu_Dphi = DeltaPhi(reco_mu.at(0).v.Phi(),reco_mu.at(1).v.Phi());
-    outTree.mu_DR = DeltaR(reco_mu.at(0).v.Eta(),reco_mu.at(0).v.Phi(),reco_mu.at(1).v.Eta(),reco_mu.at(1).v.Phi());
+      outTree.mu1_pt = reco_mu.at(0).v.Pt();
+      outTree.mu2_pt = reco_mu.at(1).v.Pt();
+      outTree.mu1_eta = reco_mu.at(0).v.Eta();
+      outTree.mu2_eta = reco_mu.at(1).v.Eta();
+      outTree.mu1_phi = reco_mu.at(0).v.Phi();
+      outTree.mu2_phi = reco_mu.at(1).v.Phi();
+      outTree.mu1_dxy = treeVars.muons_dxy->at(reco_mu.at(0).it);
+      outTree.mu2_dxy = treeVars.muons_dxy->at(reco_mu.at(1).it);
+      outTree.mu1_dxyPull = fabs(treeVars.muons_dxy->at(reco_mu.at(0).it))/treeVars.muons_dxyErr->at(reco_mu.at(0).it);
+      outTree.mu2_dxyPull = fabs(treeVars.muons_dxy->at(reco_mu.at(1).it))/treeVars.muons_dxyErr->at(reco_mu.at(1).it);
+      outTree.mu1_dz = treeVars.muons_dz->at(reco_mu.at(0).it);
+      outTree.mu2_dz = treeVars.muons_dz->at(reco_mu.at(1).it);
+      outTree.mu1_dzPull = fabs(treeVars.muons_dz->at(reco_mu.at(0).it))/treeVars.muons_dzErr->at(reco_mu.at(0).it);
+      outTree.mu2_dzPull = fabs(treeVars.muons_dz->at(reco_mu.at(1).it))/treeVars.muons_dzErr->at(reco_mu.at(1).it);
+      outTree.mu1_relIso = mu1_iso/reco_mu.at(0).v.Pt();
+      outTree.mu2_relIso = mu2_iso/reco_mu.at(1).v.Pt();
+      outTree.mu1_isL = treeVars.muons_isLoose->at(reco_mu.at(0).it);
+      outTree.mu2_isL = treeVars.muons_isLoose->at(reco_mu.at(1).it);
+      outTree.mu1_isM = treeVars.muons_isMedium->at(reco_mu.at(0).it);
+      outTree.mu2_isM = treeVars.muons_isMedium->at(reco_mu.at(1).it);
+      outTree.mu1_isT = treeVars.muons_isTight->at(reco_mu.at(0).it);
+      outTree.mu2_isT = treeVars.muons_isTight->at(reco_mu.at(1).it);
+      outTree.mu_Deta = DeltaEta(reco_mu.at(0).v.Eta(),reco_mu.at(1).v.Eta());
+      outTree.mu_Dphi = DeltaPhi(reco_mu.at(0).v.Phi(),reco_mu.at(1).v.Phi());
+      outTree.mu_DR = DeltaR(reco_mu.at(0).v.Eta(),reco_mu.at(0).v.Phi(),reco_mu.at(1).v.Eta(),reco_mu.at(1).v.Phi());
+      
+    /*  outTree.ele1_pt = reco_ele.at(0).v.Pt();
+      outTree.ele2_pt = reco_ele.at(1).v.Pt();
+      outTree.ele1_eta = reco_ele.at(0).v.Eta();
+      outTree.ele2_eta = reco_ele.at(1).v.Eta();
+      outTree.ele1_phi = reco_ele.at(0).v.Phi();
+      outTree.ele2_phi = reco_ele.at(1).v.Phi();
+      outTree.ele1_dxy = treeVars.electrons_dxy->at(reco_ele.at(0).it);
+      outTree.ele2_dxy = treeVars.electrons_dxy->at(reco_ele.at(1).it);
+      outTree.ele1_dxyPull = fabs(treeVars.electrons_dxy->at(reco_ele.at(0).it))/treeVars.electrons_dxyErr->at(reco_ele.at(0).it);
+      outTree.ele2_dxyPull = fabs(treeVars.electrons_dxy->at(reco_ele.at(1).it))/treeVars.electrons_dxyErr->at(reco_ele.at(1).it);
+      outTree.ele1_dz = treeVars.electrons_dz->at(reco_ele.at(0).it);
+      outTree.ele2_dz = treeVars.electrons_dz->at(reco_ele.at(1).it);
+      outTree.ele1_dzPull = fabs(treeVars.electrons_dz->at(reco_ele.at(0).it))/treeVars.electrons_dzErr->at(reco_ele.at(0).it);
+      outTree.ele2_dzPull = fabs(treeVars.electrons_dz->at(reco_ele.at(1).it))/treeVars.electrons_dzErr->at(reco_ele.at(1).it);
+      outTree.ele1_IDMVA = treeVars.electrons_MVAID->at(reco_ele.at(0).it);
+      outTree.ele2_IDMVA = treeVars.electrons_MVAID->at(reco_ele.at(1).it);
+      outTree.ele_Deta = DeltaEta(reco_ele.at(0).v.Eta(),reco_ele.at(1).v.Eta());
+      outTree.ele_Dphi = DeltaPhi(reco_ele.at(0).v.Phi(),reco_ele.at(1).v.Phi());
+      outTree.ele_DR = DeltaR(reco_ele.at(0).v.Eta(),reco_ele.at(0).v.Phi(),reco_ele.at(1).v.Eta(),reco_ele.at(1).v.Phi());*/
     
-    outTree.H_pt = reco_H.v.Pt();
-    outTree.H_eta = reco_H.v.Eta();
-    outTree.H_phi = reco_H.v.Phi();
-    outTree.H_mass = reco_H.v.M();
+      outTree.Z_pt = reco_Z.v.Pt();
+      outTree.Z_eta = reco_Z.v.Eta();
+      outTree.Z_phi = reco_Z.v.Phi();
+      outTree.Z_mass = reco_Z.v.M();
+
+      outTree.H_pt = reco_H.v.Pt();
+      outTree.H_eta = reco_H.v.Eta();
+      outTree.H_phi = reco_H.v.Phi();
+      outTree.H_mass = reco_H.v.M();
+
+      outTree.met_pt = treeVars.met_pt;
+      outTree.met_phi = treeVars.met_phi;
+      outTree.met_sig = treeVars.met_sig;
     
-    outTree.met_pt = treeVars.met_pt;
-    outTree.met_phi = treeVars.met_phi;
-    outTree.met_sig = treeVars.met_sig;
+      outTree.weight = weight;
+      outTree.weight_MC = mcWeight;
+      outTree.weight_PU = puWeight;
     
-    outTree.weight = weight;
-    outTree.weight_MC = mcWeight;
-    outTree.weight_PU = puWeight;
-    
-    outTree.GetTTreePtr()->Fill();
-    if( debugMode ) std::cout << ">>>>>> end filling out tree" << std::endl;
-    
-    
-    
+      outTree.GetTTreePtr()->Fill();
+      if( debugMode )  std::cout << ">>>>>> end filling out tree" << std::endl;
+
     //---------------
     //--- print event
     if( debugMode ) std::cout << ">>>>>> start print event" << std::endl;
@@ -799,9 +916,167 @@ int main(int argc, char** argv)
     if( printGenEvent || printRecoGenMatchEvent || printRecoEvent )
       std::cout << std::endl;
     if( debugMode ) std::cout << ">>>>>> end print event" << std::endl;
+    }//fine if
+
+    
+
+
+ //---------------------
+    //--- select reco electrons
+    if (doEle)
+    {
+      if( debugMode ) std::cout << ">>>>>> start reco ele selection" << std::endl;
+    
+      if( temp_gamma.size() < 1 ) continue;
+      if( temp_ele.size() < 2 ) continue;
+    
+      for(unsigned int ii = 0; ii < temp_gamma.size(); ++ii)
+      {
+        if( temp_gamma.at(ii).v.Pt() < reco_ptMin_gamma ) continue; 
+
+        if( fabs(temp_gamma.at(ii).v.Eta()) > reco_eta_gamma ) continue;
+
+        if( fabs(temp_gamma.at(ii).v.Eta()) > reco_eta1_gamma && fabs(temp_gamma.at(ii).v.Eta()) < reco_eta2_gamma) continue;
+
+	if (treeVars.photons_MVAID->at(temp_gamma.at(ii).it) < reco_ID_gamma) continue;
+
+        reco_gamma.push_back( temp_gamma.at(ii) );
+        break;
+      }
+
+      if( reco_gamma.size() < 1 ) continue;
+      float ele1_DR;
+
+      for(unsigned int ii = 0; ii < temp_ele.size(); ++ii)
+      {
+
+        if( temp_ele.at(ii).v.Pt() < reco_ptMin1_ele ) continue;
+
+        if( fabs(temp_ele.at(ii).v.Eta()) > reco_eta_ele ) continue;
+
+      //  if( fabs(treeVars.electrons_dxy->at(temp_ele.at(ii).it)) > 0.05 ) continue; //
+
+       // if( fabs(treeVars.electrons_dz->at(temp_ele.at(ii).it))  > 0.10 ) continue;
+
+      	if (treeVars.electrons_MVAID->at(temp_ele.at(ii).it) < reco_ID_ele) continue;
+
+         
+        ele1_DR = DeltaR(reco_gamma.at(0).v.Eta(),reco_gamma.at(0).v.Phi(),temp_ele.at(ii).v.Eta(),temp_ele.at(ii).v.Phi());
+
+        if (ele1_DR < reco_DR_lep) continue;
+
+        reco_ele.push_back( temp_ele.at(ii) );
+
+        break;
+      }
+      if( reco_ele.size() < 1 ) continue;
+    
+      float ele2_DR;
+
+      for(unsigned int ii = 0; ii < temp_ele.size(); ++ii)
+      {
+        if( reco_ele.at(0).charge*temp_ele.at(ii).charge == 1 ) continue;
+        if( temp_ele.at(ii).v.Pt() < reco_ptMin2_ele ) continue;
+        if( fabs(temp_ele.at(ii).v.Eta()) > reco_eta_ele ) continue;
+      	if (treeVars.electrons_MVAID->at(temp_ele.at(ii).it) < reco_ID_ele) continue;
+        //if( fabs(treeVars.electrons_dxy->at(temp_ele.at(ii).it)) > 0.05 ) continue;
+        //if( fabs(treeVars.electrons_dz->at(temp_ele.at(ii).it))  > 0.10 ) continue;
+      
+        ele2_DR = DeltaR(reco_gamma.at(0).v.Eta(),reco_gamma.at(0).v.Phi(),temp_ele.at(ii).v.Eta(),temp_ele.at(ii).v.Phi());
+        if (ele2_DR < reco_DR_lep) continue;
+        reco_ele.push_back( temp_ele.at(ii) );
+        break;
+      }
+      if( reco_ele.size() < 2 ) continue;
+
+
+      reco_Z.v = reco_ele.at(0).v + reco_ele.at(1).v;
+      reco_Z.charge = reco_ele.at(0).charge + reco_ele.at(1).charge; 
+      if ( reco_Z.v.M() < 50 ) continue;
+
+      reco_H.v = reco_ele.at(0).v + reco_ele.at(1).v + reco_gamma.at(0).v;
+      reco_H.charge = reco_ele.at(0).charge + reco_ele.at(1).charge; 
+      reco_H.pdgId = 25;
+      if ( ((reco_gamma.at(0).v.Pt()) /(reco_H.v.M())) < reco_pToM_gamma ) continue;
+      if ((reco_H.v + reco_Z.v).M() < reco_sumM ) continue;
+      
+      if( debugMode ) std::cout << ">>>>>> end reco ele selection" << std::endl;
+      
     
     
+      //---------------------------
+      //--- fill out tree variables
+  
+      if( debugMode ) std::cout << ">>>>>> start filling out tree" << std::endl;
+      outTree.vtxs_n = treeVars.vtxs_n;
+      outTree.rho_all = treeVars.rho_all;
+
+      outTree.gamma_pt = reco_gamma.at(0).v.Pt();
+      outTree.gamma_eta = reco_gamma.at(0).v.Eta();
+      outTree.gamma_phi = reco_gamma.at(0).v.Phi();    
+      outTree.gamma_DR1 = DeltaR(reco_gamma.at(0).v.Eta(),reco_gamma.at(0).v.Phi(),reco_ele.at(0).v.Eta(),reco_ele.at(0).v.Phi());
+      outTree.gamma_DR2 = DeltaR(reco_gamma.at(0).v.Eta(),reco_gamma.at(0).v.Phi(),reco_ele.at(1).v.Eta(),reco_ele.at(1).v.Phi());
+      outTree.gamma_IDMVA = treeVars.photons_MVAID->at(reco_gamma.at(0).it);
     
+      outTree.ele1_pt = reco_ele.at(0).v.Pt();
+      outTree.ele2_pt = reco_ele.at(1).v.Pt();
+      outTree.ele1_eta = reco_ele.at(0).v.Eta();
+      outTree.ele2_eta = reco_ele.at(1).v.Eta();
+      outTree.ele1_phi = reco_ele.at(0).v.Phi();
+      outTree.ele2_phi = reco_ele.at(1).v.Phi();
+      outTree.ele1_IDMVA = treeVars.electrons_MVAID->at(reco_ele.at(0).it);
+      outTree.ele2_IDMVA = treeVars.electrons_MVAID->at(reco_ele.at(1).it);
+      outTree.ele_Deta = DeltaEta(reco_ele.at(0).v.Eta(),reco_ele.at(1).v.Eta());
+      outTree.ele_Dphi = DeltaPhi(reco_ele.at(0).v.Phi(),reco_ele.at(1).v.Phi());
+      outTree.ele_DR = DeltaR(reco_ele.at(0).v.Eta(),reco_ele.at(0).v.Phi(),reco_ele.at(1).v.Eta(),reco_ele.at(1).v.Phi());
+      
+       outTree.Z_pt = reco_Z.v.Pt();
+      outTree.Z_eta = reco_Z.v.Eta();
+      outTree.Z_phi = reco_Z.v.Phi();
+      outTree.Z_mass = reco_Z.v.M();
+    
+      outTree.H_pt = reco_H.v.Pt();
+      outTree.H_eta = reco_H.v.Eta();
+      outTree.H_phi = reco_H.v.Phi();
+      outTree.H_mass = reco_H.v.M();
+
+      outTree.met_pt = treeVars.met_pt;
+      outTree.met_phi = treeVars.met_phi;
+      outTree.met_sig = treeVars.met_sig;
+    
+      outTree.weight = weight;
+      outTree.weight_MC = mcWeight;
+      outTree.weight_PU = puWeight;
+    
+      outTree.GetTTreePtr()->Fill();
+      if( debugMode )  std::cout << ">>>>>> end filling out tree" << std::endl;
+
+    //---------------
+    //--- print event
+    if( debugMode ) std::cout << ">>>>>> start print event" << std::endl;
+    if( printGenEvent || printRecoGenMatchEvent || printRecoEvent )
+      std::cout << "\n\n Event: " << entry << std::endl;
+    if( printGenEvent && isSignal )
+    {
+      std::cout << "--------------------- GEN ---------------------" << std::endl;
+      PrintEvent(gen_mu);
+    }
+    if( printRecoGenMatchEvent && isSignal )
+    {
+      std::cout << "--------------------- GEN MATCH ---------------------" << std::endl;
+      PrintEvent(recoGenMatch_mu);
+    }
+    if( printRecoEvent )
+    {
+      std::cout << "--------------------- RECO ---------------------" << std::endl;
+      PrintEvent(reco_mu);
+    }
+    if( printGenEvent || printRecoGenMatchEvent || printRecoEvent )
+      std::cout << std::endl;
+    if( debugMode ) std::cout << ">>>>>> end print event" << std::endl;
+    }//fine if ELE
+
+
     /*
     //-------------------
     //--- fill histograms
@@ -865,6 +1140,7 @@ int main(int argc, char** argv)
   std::cout << "nr of MB written:  " << int(bytes/1024./1024.) << std::endl;
   std::cout << "============================================"  << std::endl;
   
+
   
   return 0;
 }

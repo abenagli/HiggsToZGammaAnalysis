@@ -49,6 +49,19 @@ void InitTreeVars(TChain* chain_reco, TChain* chain_gen, TreeVars& treeVars)
   treeVars.muons_pfIsoPhoton = new std::vector<float>;
   treeVars.muons_pfIsoPU = new std::vector<float>;
   treeVars.muons_trackerLayersWithMeasurement = new std::vector<int>;
+
+  treeVars.electrons_pt = new std::vector<float>;
+  treeVars.electrons_eta = new std::vector<float>;
+  treeVars.electrons_phi = new std::vector<float>;
+  treeVars.electrons_EnergyPostCorr = new std::vector<float>;
+  treeVars.electrons_charge = new std::vector<int>;
+  treeVars.electrons_MVAID = new std::vector<float>;
+
+  treeVars.photons_pt = new std::vector<float>;
+  treeVars.photons_eta = new std::vector<float>;
+  treeVars.photons_phi = new std::vector<float>;
+  treeVars.photons_EnergyPostCorr = new std::vector<float>;
+  treeVars.photons_MVAID = new std::vector<float>;
   
   treeVars.jets_pt = new std::vector<float>;
   treeVars.jets_eta = new std::vector<float>;
@@ -140,6 +153,20 @@ void InitTreeVars(TChain* chain_reco, TChain* chain_gen, TreeVars& treeVars)
     chain_reco -> SetBranchStatus("muons_pfIsoPhoton",         1); chain_reco -> SetBranchAddress("muons_pfIsoPhoton",         &treeVars.muons_pfIsoPhoton);
     chain_reco -> SetBranchStatus("muons_pfIsoPU",             1); chain_reco -> SetBranchAddress("muons_pfIsoPU",             &treeVars.muons_pfIsoPU);
     chain_reco -> SetBranchStatus("muons_trackerLayersWithMeasurement",1); chain_reco -> SetBranchAddress("muons_trackerLayersWithMeasurement",&treeVars.muons_trackerLayersWithMeasurement);
+
+    chain_reco -> SetBranchStatus("electrons_pt",      1); chain_reco -> SetBranchAddress("electrons_pt",      &treeVars.electrons_pt);
+    chain_reco -> SetBranchStatus("electrons_eta",     1); chain_reco -> SetBranchAddress("electrons_eta",     &treeVars.electrons_eta);
+    chain_reco -> SetBranchStatus("electrons_phi",     1); chain_reco -> SetBranchAddress("electrons_phi",     &treeVars.electrons_phi);
+    chain_reco -> SetBranchStatus("electrons_EnergyPostCorr",  1); chain_reco -> SetBranchAddress("electrons_EnergyPostCorr",  &treeVars.electrons_EnergyPostCorr);
+    chain_reco -> SetBranchStatus("electrons_charge",  1); chain_reco -> SetBranchAddress("electrons_charge",  &treeVars.electrons_charge);
+    chain_reco -> SetBranchStatus("electrons_MVAID", 1); chain_reco -> SetBranchAddress("electrons_MVAID", &treeVars.electrons_MVAID);
+
+    chain_reco -> SetBranchStatus("photons_pt",      1); chain_reco -> SetBranchAddress("photons_pt",      &treeVars.photons_pt);
+    chain_reco -> SetBranchStatus("photons_eta",     1); chain_reco -> SetBranchAddress("photons_eta",     &treeVars.photons_eta);
+    chain_reco -> SetBranchStatus("photons_phi",     1); chain_reco -> SetBranchAddress("photons_phi",     &treeVars.photons_phi);
+    chain_reco -> SetBranchStatus("photons_EnergyPostCorr",  1); chain_reco -> SetBranchAddress("photons_EnergyPostCorr",  &treeVars.photons_EnergyPostCorr);
+    chain_reco -> SetBranchStatus("photons_MVAID", 1); chain_reco -> SetBranchAddress("photons_MVAID", &treeVars.photons_MVAID);
+
     
     chain_reco -> SetBranchStatus("jets_pt",      1); chain_reco -> SetBranchAddress("jets_pt",      &treeVars.jets_pt);
     chain_reco -> SetBranchStatus("jets_eta",     1); chain_reco -> SetBranchAddress("jets_eta",     &treeVars.jets_eta);

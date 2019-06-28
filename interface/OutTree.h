@@ -18,6 +18,10 @@
   DATA(float, H_eta)                  \
   DATA(float, H_phi)                  \
   DATA(float, H_mass)                 \
+  DATA(float, Z_pt)                   \
+  DATA(float, Z_eta)                  \
+  DATA(float, Z_phi)                  \
+  DATA(float, Z_mass)                 \
   DATA(float, mu1_pt)                 \
   DATA(float, mu2_pt)                 \
   DATA(float, mu1_eta)                \
@@ -43,6 +47,23 @@
   DATA(float, mu_Deta)                \
   DATA(float, mu_Dphi)                \
   DATA(float, mu_DR)                  \
+  DATA(float, ele1_pt)                 \
+  DATA(float, ele2_pt)                 \
+  DATA(float, ele1_eta)                \
+  DATA(float, ele2_eta)                \
+  DATA(float, ele1_phi)                \
+  DATA(float, ele2_phi)                \
+  DATA(float, ele1_IDMVA)             \
+  DATA(float, ele2_IDMVA)             \
+  DATA(float, ele_Deta)                \
+  DATA(float, ele_Dphi)                \
+  DATA(float, ele_DR)                  \
+  DATA(float, gamma_pt)               \
+  DATA(float, gamma_eta)               \
+  DATA(float, gamma_phi)               \
+  DATA(float, gamma_IDMVA)             \
+  DATA(float, gamma_DR1)             \
+  DATA(float, gamma_DR2)             \
   DATA(int, jets_all_n)               \
   DATA(int, jets_all_bTagL_n)         \
   DATA(int, jets_all_bTagM_n)         \
