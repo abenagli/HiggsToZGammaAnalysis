@@ -12,6 +12,8 @@
 /*** tree variables ***/
 struct TreeVars
 {
+  std::vector<int>* genPho_HardProcFinState;
+  std::vector<int>* genPho_isPromptFinState;
   std::vector<float>* reso_pt;
   std::vector<float>* reso_eta;
   std::vector<float>* reso_phi;
@@ -38,6 +40,7 @@ struct TreeVars
   float trueNumInteractions;
   
   int vtxs_n;
+
   
   float rho_all;
   float rho_central;
@@ -72,12 +75,19 @@ struct TreeVars
   std::vector<float>* electrons_phi;
   std::vector<float>* electrons_EnergyPostCorr;
   std::vector<int>* electrons_charge;
-
+  std::vector<float>* electrons_dxy;
+  std::vector<float>* electrons_dxyErr;
+  std::vector<float>* electrons_dz;
+  std::vector<float>* electrons_dzErr;
+  std::vector<float>* electrons_full5x5_R9;
+  std::vector<float>* electrons_full5x5_sieie;
   std::vector<float>* electrons_MVAID;
 
   std::vector<float>* photons_pt;
   std::vector<float>* photons_eta;
   std::vector<float>* photons_phi;
+  std::vector<float>* photons_full5x5_R9;
+  std::vector<float>* photons_full5x5_sieie;
   std::vector<float>* photons_EnergyPostCorr;
 
 
