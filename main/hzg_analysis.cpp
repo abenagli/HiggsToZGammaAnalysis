@@ -203,6 +203,10 @@ int main(int argc, char** argv)
   int nTriggerEvents_genCuts = 0;
   int nTriggerEvents_recoLepSelection = 0;
   int nTriggerEvents_AllSelection = 0;
+    int ORTrigger_nocuts = 0; 
+    int ORTrigger_lep = 0; 
+    int ORTrigger_all = 0; 
+
   std::vector<std::pair<std::string,int> > vec_triggerPass_noCuts;
   std::vector<std::pair<std::string,int> > vec_triggerPass_genCuts;
   std::vector<std::pair<std::string,int> > vec_triggerPass_recoLepSelection;
@@ -305,7 +309,7 @@ int main(int argc, char** argv)
     //   weight = puWeight * mcWeight;
     // }
     
-    
+  //----------  
     ++nTriggerEvents_noCuts;
     for(unsigned int ii = 0; ii < treeVars.trgs_name->size(); ++ii)
     {
@@ -314,9 +318,7 @@ int main(int argc, char** argv)
       if( it != vec_triggerPass_noCuts.end() ) it->second += treeVars.trgs_pass->at(ii);
       else vec_triggerPass_noCuts.push_back( p );
     }
-    
-    
-    //--------------
+
     //--- candidates
     particle gen_H;
     std::vector<particle> gen_mu;
@@ -560,7 +562,7 @@ int main(int argc, char** argv)
     bool trgPassOne = false;
     for(unsigned int ii = 0; ii < treeVars.trgs_name->size(); ++ii)
     {
-       //std::cout << "HLT name: " << treeVars.trgs_name->at(ii) << "   pass: " << treeVars.trgs_pass->at(ii) << "    prescale: " << treeVars.trgs_prescale->at(ii) << std::endl;
+      // std::cout << "HLT name: " << treeVars.trgs_name->at(ii) << "   pass: " << treeVars.trgs_pass->at(ii) << "    prescale: " << treeVars.trgs_prescale->at(ii) << std::endl;
       for(unsigned int jj = 0; jj < reco_HLT_paths.size(); ++jj)
       {
         std::size_t found = treeVars.trgs_name->at(ii).find( reco_HLT_paths.at(jj) );
@@ -586,7 +588,7 @@ int main(int argc, char** argv)
     if( reco_HLTCut && (!reco_HLT_OR && !trgPassAll) ) continue;
     if( debugMode ) std::cout << ">>>>>> end trigger selection" << std::endl;
     
-    
+
     
     //---------------------
     //--- select reco muons
@@ -656,6 +658,8 @@ int main(int argc, char** argv)
       else vec_triggerPass_recoLepSelection.push_back( p );
     }
     
+
+
       for(unsigned int ii = 0; ii < temp_gamma.size(); ++ii)
       {
         if( temp_gamma.at(ii).v.Pt() < reco_ptMin_gamma ) continue;
@@ -709,6 +713,8 @@ int main(int argc, char** argv)
       if( it != vec_triggerPass_AllSelection.end() ) it->second += treeVars.trgs_pass->at(ii);
       else vec_triggerPass_AllSelection.push_back( p );
     }
+
+
       
       //save a third lepton if present
       if( debugMode ) std::cout << ">>>>>> start third lepton" << std::endl;
@@ -904,7 +910,7 @@ int main(int argc, char** argv)
           std::cout << "DR con mu 2  " << DeltaR(temp_jets.at(kk).v.Eta(),temp_jets.at(kk).v.Phi(),reco_mu.at(1).v.Eta(),reco_mu.at(1).v.Phi()) << std::endl;
 	  std::cout << "reco_jets.size()  "   << reco_jets.size() << std::endl;
           std::cout << "jets delta eta" <<  DeltaEta(temp_jets.at(ii).v.Eta(),temp_jets.at(kk).v.Eta()) <<  std::endl;
-          std::cout << "ZEppenfield   " << (reco_H.v.Eta()-(temp_jets.at(ii).v.Eta()+temp_jets.at(kk).v.Eta())/2.)  << std::endl;
+          std::cout << "ZEppenfield   " << fabs(reco_H.v.Eta()-(temp_jets.at(ii).v.Eta()+temp_jets.at(kk).v.Eta())/2.)  << std::endl;
           std::cout << "dijets mass " << dijet.v.M() << std::endl;
 	  std::cout << "reco_jets.size()  "   <<  DeltaPhi(reco_H.v.Phi(),dijet.v.Phi()) << std::endl;
         }
@@ -928,11 +934,11 @@ int main(int argc, char** argv)
 
         
          if( fabs(DeltaEta(temp_jets.at(ii).v.Eta(),temp_jets.at(kk).v.Eta())) < 3.5 ) continue;
-        if( (reco_H.v.Eta()-(temp_jets.at(ii).v.Eta()+temp_jets.at(kk).v.Eta())/2.) > 2.5) continue;
+        if( fabs(reco_H.v.Eta()-(temp_jets.at(ii).v.Eta()+temp_jets.at(kk).v.Eta())/2.) > 2.5) continue;
 
 	
          if( dijet.v.M() < 500 ) continue;
-         if( DeltaPhi(reco_H.v.Phi(),dijet.v.Phi()) < 2.4 ) continue;
+         if( fabs(DeltaPhi(reco_H.v.Phi(),dijet.v.Phi()) )< 2.4 ) continue;
 
         if( skipJet ) continue;
         reco_jets.push_back(temp_jets.at(ii));
@@ -974,7 +980,8 @@ int main(int argc, char** argv)
           isCat = true; 
 
          }
-	if (!isCat && reco_H.v.Pt() > 60) //boosted
+	//if (!isCat && reco_H.v.Pt()/reco_H.v.M() > 0.48) //boosted
+	if (!isCat && reco_H.v.Pt()> 60) //boosted
 	{
           cat_n = 7; 
           isCat = true; 
@@ -1188,6 +1195,8 @@ outTree.jet2_phi = (reco_jets.size()==2 ? reco_jets.at(1).v.Phi() : -100);
     
 
 
+    
+
  //---------------------
     //--- select reco electrons
     if (doEle)
@@ -1250,7 +1259,8 @@ outTree.jet2_phi = (reco_jets.size()==2 ? reco_jets.at(1).v.Phi() : -100);
       if( it != vec_triggerPass_recoLepSelection.end() ) it->second += treeVars.trgs_pass->at(ii);
       else vec_triggerPass_recoLepSelection.push_back( p );
     }
-  // --------------------------------
+
+
       for(unsigned int ii = 0; ii < temp_gamma.size(); ++ii)
       {
         if(temp_gamma.at(ii).v.Pt() < reco_ptMin_gamma) continue; 
@@ -1301,7 +1311,7 @@ outTree.jet2_phi = (reco_jets.size()==2 ? reco_jets.at(1).v.Phi() : -100);
       if( it != vec_triggerPass_AllSelection.end() ) it->second += treeVars.trgs_pass->at(ii);
       else vec_triggerPass_AllSelection.push_back( p );
     }
-    //--------------------------------
+
 
  //save a third lepton if present
       if( debugMode ) std::cout << ">>>>>> start third lepton" << std::endl;
@@ -1429,7 +1439,7 @@ outTree.jet2_phi = (reco_jets.size()==2 ? reco_jets.at(1).v.Phi() : -100);
           std::cout << "DR con mu 2  " << DeltaR(temp_jets.at(kk).v.Eta(),temp_jets.at(kk).v.Phi(),reco_ele.at(1).v.Eta(),reco_ele.at(1).v.Phi()) << std::endl;
 	  std::cout << "reco_jets.size()  "   << reco_jets.size() << std::endl;
           std::cout << "jets delta eta" <<  DeltaEta(temp_jets.at(ii).v.Eta(),temp_jets.at(kk).v.Eta()) <<  std::endl;
-          std::cout << "ZEppenfield   " << (reco_H.v.Eta()-(temp_jets.at(ii).v.Eta()+temp_jets.at(kk).v.Eta())/2.)  << std::endl;
+          std::cout << "ZEppenfield   " << fabs(reco_H.v.Eta()-(temp_jets.at(ii).v.Eta()+temp_jets.at(kk).v.Eta())/2.)  << std::endl;
           std::cout << "dijets mass " << dijet.v.M() << std::endl;
 	  std::cout << "reco_jets.size()  "   <<  DeltaPhi(reco_H.v.Phi(),dijet.v.Phi()) << std::endl;
         }
@@ -1453,11 +1463,11 @@ outTree.jet2_phi = (reco_jets.size()==2 ? reco_jets.at(1).v.Phi() : -100);
 
         
          if( fabs(DeltaEta(temp_jets.at(ii).v.Eta(),temp_jets.at(kk).v.Eta())) < 3.5 ) continue;
-        if( (reco_H.v.Eta()-(temp_jets.at(ii).v.Eta()+temp_jets.at(kk).v.Eta())/2.) > 2.5) continue;
+        if( fabs(reco_H.v.Eta()-(temp_jets.at(ii).v.Eta()+temp_jets.at(kk).v.Eta())/2.) > 2.5) continue;
 
 	
          if( dijet.v.M() < 500 ) continue;
-         if( DeltaPhi(reco_H.v.Phi(),dijet.v.Phi()) < 2.4 ) continue;
+         if(fabs( DeltaPhi(reco_H.v.Phi(),dijet.v.Phi())) < 2.4 ) continue;
 
         if( skipJet ) continue;
         reco_jets.push_back(temp_jets.at(ii));
@@ -1491,7 +1501,8 @@ outTree.jet2_phi = (reco_jets.size()==2 ? reco_jets.at(1).v.Phi() : -100);
           isCat = true; 
 
          }
-	if (!isCat && reco_H.v.Pt() > 60) //boosted
+	//if (!isCat && reco_H.v.Pt()/reco_H.v.M() > 0.48) //boosted
+	if (!isCat && reco_H.v.Pt()> 60) //boosted
 	{
           cat_n = 7; 
           isCat = true; 
@@ -1708,6 +1719,9 @@ outTree.jet2_phi = (reco_jets.size()==2 ? reco_jets.at(1).v.Phi() : -100);
   std::cout << "Z selection events " << float(Z_sel)*mcWeight*35.9 << std::endl;
   std::cout << "gamma selection events " << float(gamma_sel)*mcWeight*35.9 << std::endl;
   std::cout << "H selection events " << float(H_sel)*mcWeight*35.9 << std::endl;
+
+
+
 
   
   if(doTrigEff)

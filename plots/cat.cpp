@@ -50,15 +50,15 @@ int main(int argc, char *argv[])
 	extraText  = "Preliminary";  // default extra text is "Preliminary"
 	lumi_sqrtS = "";       // used with iPeriod = 0, e.g. for simulation-only plots (default is an empty string)
 
-	setTDRStyle();
-	gStyle -> SetOptFit(0);
-	gStyle -> SetOptStat(0);*/
+	setTDRStyle();*/
+	gStyle -> SetOptFit(1);
+	gStyle -> SetOptStat(0);
 
 	TString MuonFold = "/afs/cern.ch/work/f/fcetorel/private/work2/HtogZ/HiggsToZGammaAnalysis/plots/mu/new/";
-
 	TString EleFold = "/afs/cern.ch/work/f/fcetorel/private/work2/HtogZ/HiggsToZGammaAnalysis/plots/ele/new/";
+	TString year = "2016/"; 
 
-	vector<TString> names = {"plots_mc_ttH", "plots_mc_ggH", "plots_mc_VBF", "plots_mc_WplusH","plots_mc_WminusH","plots_mc_ZH", "plots_mc_Zgamma", "plots_mc_DY", "plots_data"};
+	vector<TString> names = {"plots_mc_ttH", "plots_mc_ggH", "plots_mc_VBF", "plots_mc_WplusH","plots_mc_WminusH","plots_mc_ZH", "plots_mc_ZG", "plots_mc_DY", "plots_data_"};
 
 	TChain* ttH;
 	TChain* ggH;
@@ -82,30 +82,30 @@ int main(int argc, char *argv[])
 	{	
 		cout << "Processing muon tag" << endl;
 		ttH = new TChain("outTree");
-		ttH -> Add(MuonFold + names[0] + "*.root");		
+		ttH -> Add(MuonFold + year + "corr_sel/" + names[0] + "*.root");		
 		ggH = new TChain("outTree");
-		ggH -> Add(MuonFold + names[1] + "*.root");		
+		ggH -> Add(MuonFold + year + "corr_sel/" + names[1] + "*.root");		
 		vbf = new TChain("outTree");
-		vbf -> Add(MuonFold + names[2] + "*.root");		
+		vbf -> Add(MuonFold + year + "corr_sel/" + names[2] + "*.root");		
 		wph = new TChain("outTree");
-		wph -> Add(MuonFold + names[3] + "*.root");	
+		wph -> Add(MuonFold + year + "corr_sel/" + names[3] + "*.root");	
 		wmh = new TChain("outTree");
-		wmh -> Add(MuonFold + names[4] + "*.root");		
+		wmh -> Add(MuonFold + year + "corr_sel/" + names[4] + "*.root");		
 		zh = new TChain("outTree");
-		zh -> Add(MuonFold + names[5] + "*.root");
+		zh -> Add(MuonFold + year + "corr_sel/" + names[5] + "*.root");
 
 
-	/*	data = new TChain("out_tree");
-		data -> Add(MuonFold + names[8] + "*.root");
+		data = new TChain("outTree");
+		data -> Add(MuonFold + year + "new_boosted/" + names[8] + "DoubleMuon*.root");
 		
 	
 		
-		Zgamma = new TChain("out_tree"); 
-		Zgamma -> Add(MuonFold + names[6] + ".root");
+		Zgamma = new TChain("outTree"); 
+		Zgamma -> Add(MuonFold + year + names[6] + "*.root");
 				
-		DY = new TChain("out_tree");
-		DY -> Add(MuonFold + names[7] + ".root");
-	*/
+		DY = new TChain("outTree");
+		DY -> Add(MuonFold + year + "corr_sel/" + names[7] + "*.root");
+
 
 	
 	
@@ -115,29 +115,29 @@ int main(int argc, char *argv[])
 	else
 	{	cout << "Processing electron tag" << endl;
 		ttH = new TChain("outTree");
-		ttH -> Add(EleFold + names[0] + "*.root");		
+		ttH -> Add(EleFold + year + "corr_sel/"+ names[0] + "*.root");		
 		ggH = new TChain("outTree");
-		ggH -> Add(EleFold + names[1] + "*.root");		
+		ggH -> Add(EleFold + year + "corr_sel/"+names[1] + "*.root");		
 		vbf = new TChain("outTree");
-		vbf -> Add(EleFold + names[2] + "*.root");		
+		vbf -> Add(EleFold + year + "corr_sel/"+names[2] + "*.root");		
 		wph = new TChain("outTree");
-		wph -> Add(EleFold + names[3] + "*.root");	
+		wph -> Add(EleFold + year + "corr_sel/"+ names[3] + "*.root");	
 		wmh = new TChain("outTree");
-		wmh -> Add(EleFold + names[4] + "*.root");		
+		wmh -> Add(EleFold + year + "corr_sel/"+ names[4] + "*.root");		
 		zh = new TChain("outTree");
-		zh -> Add(EleFold + names[5] + "*.root");
+		zh -> Add(EleFold + year + "corr_sel/"+ names[5] + "*.root");
 
-/*
-		data = new TChain("out_tree");
-		data -> Add(EleFold + names[8] + "*.root");
+
+		data = new TChain("outTree");
+		data -> Add(EleFold +  year + "new_boosted/" + names[8] + "DoubleEG*.root");
 		
 	
 		
-		Zgamma = new TChain("out_tree"); 
-		Zgamma -> Add(EleFold + names[6] + ".root");
+		Zgamma = new TChain("outTree"); 
+		Zgamma -> Add(EleFold + year +  names[6] + "*.root");
 				
-		DY = new TChain("out_tree");
-		DY -> Add(EleFold + names[7] + ".root");	*/	
+		DY = new TChain("outTree");
+		DY -> Add(EleFold + year + "corr_sel/" +  names[7] + "*.root");		
 
 	}
 
@@ -150,6 +150,7 @@ int main(int argc, char *argv[])
 	
 	float H_mass = 0.;
 	float ele1_pt = 0.;
+	float ele3_pt = 0.;
 	float mu3_pt = 0.;
 
 
@@ -161,7 +162,7 @@ int main(int argc, char *argv[])
 
 	H_mass_tot_histo = new TH1F("H_mass_histo_tot", "; Invariant mass H (GeV); Counts", 80, 100, 180 );
 
-	for(int i=0; i<6; i++)
+	for(int i=0; i<nhisto; i++)
 	{	
 		for(int j=0; j<7; j++)	
                 {
@@ -170,7 +171,7 @@ int main(int argc, char *argv[])
 
 	}
 
-	for(int n=0; n<6; n++)
+	for(int n=0; n<nhisto; n++)
 	{
 		int nentries;
 		TChain* serviceTree;
@@ -233,6 +234,7 @@ int main(int argc, char *argv[])
 		serviceTree -> SetBranchAddress("weight_MC", &weight_MC);
 		serviceTree -> SetBranchAddress("cat_n", &cat_n);
 		serviceTree -> SetBranchAddress("ele1_pt", &ele1_pt);
+		serviceTree -> SetBranchAddress("ele3_pt", &ele3_pt);
 		serviceTree -> SetBranchAddress("mu3_pt", &mu3_pt);
 
 
@@ -249,11 +251,17 @@ int main(int argc, char *argv[])
 
 			if(i%10000==0) cout << "Processing tag " << names[n] << ", event " << i << " out of " << nentries << "\r" << flush;			
 			
-			if (H_mass < 100 || H_mass > 180)  continue;
-			if (cat_n == 6 && ele1_pt != -100) continue; 
+			if (n==8) weight_MC = 1./lumiFactor; 
+
+
+			if (isMuon && cat_n == 6 && (ele1_pt>0 && ele1_pt < 10)) continue; //no 3rd ele with pt < 10
+			if (!isMuon && cat_n == 6 && (ele3_pt>0 && ele3_pt < 10)) continue; 
 			
+			if (n==8) H_mass_tot_histo -> Fill(H_mass, weight_MC*lumiFactor);
+			if (H_mass < 100 || H_mass > 180)  continue;
+			//if (n==8 && (H_mass >115 && H_mass < 135))  continue;
 			H_mass_histo[n][cat_n-1] -> Fill(H_mass, weight_MC*lumiFactor);
-			H_mass_tot_histo -> Fill(H_mass, weight_MC*lumiFactor);
+
 
 
 
@@ -267,6 +275,32 @@ int main(int argc, char *argv[])
 
 	}
 
+	//Data
+  /*  	for (int i=0; i<7; i++)
+        {  
+		TCanvas c; 
+		TF1 *f1= new TF1("f1","expo",115, 170); 
+		f1->SetLineColor(kRed); 
+		H_mass_histo[8][i] -> SetMarkerStyle(20);		
+		H_mass_histo[8][i] -> SetMarkerSize(1);
+		H_mass_histo[8][i] -> SetMarkerColor(kBlack);
+		H_mass_histo[8][i] -> SetFillStyle(0);
+		H_mass_histo[8][i] -> GetXaxis() -> SetRangeUser(115,170) ;
+		H_mass_histo[8][i]->Draw("E1");
+		H_mass_histo[8][i]->Fit("f1","q");
+		float nevents_125 = f1->Eval(125);
+		f1->Draw("Same");
+
+		float nevents_tot = f1->Integral(115,170);
+		float nevents_sigma = nevents_tot*0.683; 
+		cout << "Eventi nei dati a 125  " << i << " " << nevents_125<< endl;
+		cout << "Eventi nei dati totali 115 - 170  " << i << " " << nevents_tot << endl;
+		if (i==6) c.SaveAs(("H_mass_histo_data_cat"+  std::to_string(i) + "new.pdf").c_str());
+		if (i==6)c.SaveAs(("H_mass_histo_data_cat"+  std::to_string(i) + "new.png").c_str());
+
+
+	}*/
+	//Signal
        	for (int i=0; i<6; i++)
         {  
        		for (int j=0; j<7; j++)
@@ -274,15 +308,16 @@ int main(int argc, char *argv[])
 			float ret[4];
 			const bool verbosity = true;  
 			FindSmallestInterval(ret, H_mass_histo[i][j], 0.683, verbosity); 
-			float nevents_sigma; 
+			//float nevents_sigma; 
+			float nevents_tot; 
 			float min = H_mass_histo[i][j]->FindBin(ret[2]);
 			float max = H_mass_histo[i][j]->FindBin(ret[3]);
-			nevents_sigma = H_mass_histo[i][j]-> Integral();
-			cout << nevents_sigma*0.683 << endl; 
+			nevents_tot = H_mass_histo[i][j]-> Integral();
+			cout << nevents_tot*0.683 << endl; 
 		}
 	}
-			float nevents_sigma = H_mass_tot_histo-> Integral();
-			cout << "totale  " << nevents_sigma*0.683 << endl;
+			float nevents_tot = H_mass_tot_histo-> Integral();
+			cout << "totale eventi nei dati " << nevents_tot << endl;
 
 	if(isMuon)
 	{	system("mv *.png /eos/user/f/fcetorel/www/Plot_Zgamma/muon/");
