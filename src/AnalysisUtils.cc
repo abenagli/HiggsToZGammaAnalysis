@@ -115,20 +115,44 @@ int GetBestMatch(const particle& p, std::vector<particle>& vec, std::vector<int>
 
 
 
-void PrintEvent(std::vector<particle>& mu)
+void PrintEvent(std::vector<particle>& lep)
 {
+  particle Z;
+  Z.charge = 0;
+  for(unsigned int ii = 0; ii < lep.size(); ++ii)
+  {
+    Z.v += lep.at(ii).v;
+    Z.charge += lep.at(ii).charge;
+  }
+  Z.pdgId = 23;
+  
+  std::cout << "Z: " << Z << std::endl;
+  for(unsigned int ii = 0; ii < lep.size(); ++ii)
+    std::cout << ">>>>>>   lep: " << lep.at(ii) << std::endl;
+}
+
+
+
+void PrintEvent(std::vector<particle>& lep, const particle& gamma)
+{
+  particle Z;
+  Z.charge = 0;
+  for(unsigned int ii = 0; ii < lep.size(); ++ii)
+  {
+    Z.v += lep.at(ii).v;
+    Z.charge += lep.at(ii).charge;
+  }
+  Z.pdgId = 23;
+  
   particle H;
   H.charge = 0;
-  for(unsigned int ii = 0; ii < mu.size(); ++ii)
-  {
-    H.v += mu.at(ii).v;
-    H.charge += mu.at(ii).charge;
-  }
+  H.v = Z.v + gamma.v;
+  H.charge = 0;
   H.pdgId = 25;
   
-  std::cout << "H: " << H << std::endl;
-  for(unsigned int ii = 0; ii < mu.size(); ++ii)
-    std::cout << ">>>>>>   mu: " << mu.at(ii) << std::endl;
+  std::cout << "Z: " << Z << std::endl;
+  for(unsigned int ii = 0; ii < lep.size(); ++ii)
+    std::cout << ">>>>>>   lep: " << lep.at(ii) << std::endl;
 }
 
 

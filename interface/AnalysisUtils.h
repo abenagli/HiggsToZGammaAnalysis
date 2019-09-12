@@ -97,7 +97,8 @@ bool IsMatching(const std::vector<particle>& vp1, const std::vector<particle>& v
 int GetBestMatch(const particle& p, std::vector<particle>& vec, std::vector<int>* vetoVec = NULL);
 
 
-void PrintEvent(std::vector<particle>& mu);
+void PrintEvent(std::vector<particle>& lep);
+void PrintEvent(std::vector<particle>& lep, const particle& gamma);
 
 std::ostream& operator<<(std::ostream& os, const TLorentzVector& v);
 std::ostream& operator<<(std::ostream& os, const particle& p);

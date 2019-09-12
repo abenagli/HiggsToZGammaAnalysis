@@ -4,6 +4,9 @@
 
 void InitTreeVars(TChain* chain_reco, TChain* chain_gen, TreeVars& treeVars)
 {
+  treeVars.genPho_pt = new std::vector<float>;
+  treeVars.genPho_eta = new std::vector<float>;
+  treeVars.genPho_phi = new std::vector<float>;
   treeVars.genPho_HardProcFinState = new std::vector<int>;
   treeVars.genPho_isPromptFinState = new std::vector<int>;
   treeVars.reso_pt = new std::vector<float>;
@@ -34,6 +37,7 @@ void InitTreeVars(TChain* chain_reco, TChain* chain_gen, TreeVars& treeVars)
   treeVars.trgs_prescale = new std::vector<int>;
   
   treeVars.muons_pt = new std::vector<float>;
+  // treeVars.muons_ptErr = new std::vector<float>;
   treeVars.muons_eta = new std::vector<float>;
   treeVars.muons_phi = new std::vector<float>;
   treeVars.muons_energy = new std::vector<float>;
@@ -56,6 +60,7 @@ void InitTreeVars(TChain* chain_reco, TChain* chain_gen, TreeVars& treeVars)
   treeVars.electrons_eta = new std::vector<float>;
   treeVars.electrons_phi = new std::vector<float>;
   treeVars.electrons_EnergyPostCorr = new std::vector<float>;
+  treeVars.electrons_EnergyErrPostCorr = new std::vector<float>;
   treeVars.electrons_charge = new std::vector<int>;
   treeVars.electrons_dxy = new std::vector<float>;
   treeVars.electrons_dxyErr = new std::vector<float>;
@@ -107,6 +112,9 @@ void InitTreeVars(TChain* chain_reco, TChain* chain_gen, TreeVars& treeVars)
   if( chain_gen != NULL )
   {
     chain_gen -> SetBranchStatus("reso_pt",    1); chain_gen -> SetBranchAddress("reso_pt",    &treeVars.reso_pt);
+    chain_gen -> SetBranchStatus("genPho_pt",  1); chain_gen -> SetBranchAddress("genPho_pt",  &treeVars.genPho_pt);
+    chain_gen -> SetBranchStatus("genPho_eta", 1); chain_gen -> SetBranchAddress("genPho_eta", &treeVars.genPho_eta);
+    chain_gen -> SetBranchStatus("genPho_phi", 1); chain_gen -> SetBranchAddress("genPho_phi", &treeVars.genPho_phi);
     chain_gen -> SetBranchStatus("genPho_HardProcFinState",    1); chain_gen -> SetBranchAddress("genPho_HardProcFinState",    &treeVars.genPho_HardProcFinState);
     chain_gen -> SetBranchStatus("genPho_isPromptFinState",    1); chain_gen -> SetBranchAddress("genPho_isPromptFinState",    &treeVars.genPho_isPromptFinState);
     chain_gen -> SetBranchStatus("reso_eta",   1); chain_gen -> SetBranchAddress("reso_eta",   &treeVars.reso_eta);
@@ -148,6 +156,7 @@ void InitTreeVars(TChain* chain_reco, TChain* chain_gen, TreeVars& treeVars)
     chain_reco -> SetBranchStatus("trgs_prescale",1); chain_reco -> SetBranchAddress("trgs_prescale",&treeVars.trgs_prescale);
     
     chain_reco -> SetBranchStatus("muons_pt",      1); chain_reco -> SetBranchAddress("muons_pt",      &treeVars.muons_pt);
+    // chain_reco -> SetBranchStatus("muons_ptErr",   1); chain_reco -> SetBranchAddress("muons_ptErr",   &treeVars.muons_ptErr);
     chain_reco -> SetBranchStatus("muons_eta",     1); chain_reco -> SetBranchAddress("muons_eta",     &treeVars.muons_eta);
     chain_reco -> SetBranchStatus("muons_phi",     1); chain_reco -> SetBranchAddress("muons_phi",     &treeVars.muons_phi);
     chain_reco -> SetBranchStatus("muons_energy",  1); chain_reco -> SetBranchAddress("muons_energy",  &treeVars.muons_energy);
@@ -170,6 +179,7 @@ void InitTreeVars(TChain* chain_reco, TChain* chain_gen, TreeVars& treeVars)
     chain_reco -> SetBranchStatus("electrons_eta",     1); chain_reco -> SetBranchAddress("electrons_eta",     &treeVars.electrons_eta);
     chain_reco -> SetBranchStatus("electrons_phi",     1); chain_reco -> SetBranchAddress("electrons_phi",     &treeVars.electrons_phi);
     chain_reco -> SetBranchStatus("electrons_EnergyPostCorr",  1); chain_reco -> SetBranchAddress("electrons_EnergyPostCorr",  &treeVars.electrons_EnergyPostCorr);
+    chain_reco -> SetBranchStatus("electrons_EnergyErrPostCorr",  1); chain_reco -> SetBranchAddress("electrons_EnergyErrPostCorr",  &treeVars.electrons_EnergyErrPostCorr);
     chain_reco -> SetBranchStatus("electrons_charge",  1); chain_reco -> SetBranchAddress("electrons_charge",  &treeVars.electrons_charge);
     chain_reco -> SetBranchStatus("electrons_dxy",     1); chain_reco -> SetBranchAddress("electrons_dxy",     &treeVars.electrons_dxy);
     chain_reco -> SetBranchStatus("electrons_dxyErr",  1); chain_reco -> SetBranchAddress("electrons_dxyErr",  &treeVars.electrons_dxyErr);

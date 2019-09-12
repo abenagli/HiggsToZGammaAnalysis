@@ -25,8 +25,11 @@
   DATA(float, Z_mass)                 \
   DATA(float, mu1_pt)                 \
   DATA(float, mu2_pt)                 \
-  DATA(float, mu3_pt)                 \
-  DATA(float, mu1_eta)                \
+  DATA(float, mu3_pt)                    \
+  DATA(float, mu1_ptErr)                 \
+  DATA(float, mu2_ptErr)                 \
+  DATA(float, mu3_ptErr)                 \
+  DATA(float, mu1_eta)                   \
   DATA(float, mu2_eta)                \
   DATA(float, mu3_eta)                \
   DATA(float, mu1_phi)                \
@@ -67,23 +70,29 @@
   DATA(float, ele3_eta)                \
   DATA(float, ele1_phi)                \
   DATA(float, ele2_phi)                \
-  DATA(float, ele3_phi)                \
-  DATA(float, ele1_IDMVA)             \
-  DATA(float, ele2_IDMVA)             \
-  DATA(float, ele3_IDMVA)             \
+  DATA(float, ele3_phi)                   \
+  DATA(float, ele1_energy)                \
+  DATA(float, ele2_energy)                \
+  DATA(float, ele3_energy)                \
+  DATA(float, ele1_energyErr)             \
+  DATA(float, ele2_energyErr)             \
+  DATA(float, ele3_energyErr)             \
+  DATA(float, ele1_IDMVA)                 \
+  DATA(float, ele2_IDMVA)                 \
+  DATA(float, ele3_IDMVA)                  \
   DATA(float, ele1_full5x5_R9)             \
   DATA(float, ele2_full5x5_R9)             \
-  DATA(float, ele3_full5x5_R9)             \
+  DATA(float, ele3_full5x5_R9)                \
   DATA(float, ele1_full5x5_sieie)             \
   DATA(float, ele2_full5x5_sieie)             \
   DATA(float, ele3_full5x5_sieie)             \
-  DATA(float, ele_Deta)                \
-  DATA(float, ele_Dphi)                \
-  DATA(float, ele_DR)                  \
-  DATA(float, gamma_pt)               \
-  DATA(float, gamma_eta)               \
-  DATA(float, gamma_phi)               \
-  DATA(float, gamma_IDMVA)             \
+  DATA(float, ele_Deta)                       \
+  DATA(float, ele_Dphi)                       \
+  DATA(float, ele_DR)                         \
+  DATA(float, gamma_pt)                       \
+  DATA(float, gamma_eta)                      \
+  DATA(float, gamma_phi)                      \
+  DATA(float, gamma_IDMVA)                    \
   DATA(float, gamma_full5x5_R9)             \
   DATA(float, gamma_full5x5_sieie)     \
   DATA(float, gamma_DR1)             \
